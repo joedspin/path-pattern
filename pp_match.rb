@@ -26,11 +26,14 @@ class Pattern
     str = trim_slashes(str)
     path_arr = str.split(delim)
     parsed = Hash.new()
+    # while we're here, let's document
+    # the wildcard metrics and store the field_count
     @field_count = path_arr.length
     wildcard_found = false
     path_arr.each_with_index do |field, idx|
       if field == '*'
         @wildcard_count += 1
+        # marks where the leftmost wildcard is found
         @wildcard_score = idx unless wildcard_found 
         wildcard_found = true
       end
@@ -39,18 +42,12 @@ class Pattern
     parsed
   end
 
-  # takes in a Pattern object as an argument and returns scores as follows
-  # no match:  -1
-  # exact match: field_count
-  # wildcard match: position of the first non-wildcard match
+  # takes in a Path object as an argument and 
+  # compares it to self (Pattern)
+  # returns true if it is a match
   def matches?(path)
     return false unless path.field_count == self.field_count
-    score = self.field_count
-    puts 'pattern field count:'
-    puts self.field_count - 1
-    found_wildcard = false
     (0...self.field_count).each do |idx|
-      puts idx
       return false unless 
         self.fields[idx] == path.fields[idx] || 
         self.fields[idx] == '*'
@@ -86,7 +83,9 @@ class Path
 
 end
 
-def find_best_match(inputs)
+def find_best_match()
+  puts ARGV
+  return
   # reads in a file from the command line
   # The first line contains an integer, N, specifying the number of patterns
   # The following N lines contain one unique pattern per line
@@ -105,41 +104,44 @@ def find_best_match(inputs)
     paths << Path.new(inputs[i])
   end
   paths.each do |path|
-    fewest_wildcards = path.field_count
-    best_wildcard_score = 0
     match = Pattern.new('NO MATCH')
+    fewest_wildcards = path.field_count
+    best_wildcard_score = -1
     patterns.each do |pattern|
-      checkit = 'pattern ' + pattern.myself + ' path ' + path.myself + 'matches? ' + pattern.matches?(path).to_s
-      checkit = 'pattern ' + pattern.myself + ' path ' + path.myself + 'matches? ' + pattern.matches?(path).to_s
-      puts checkit
+      # checkit = 'pattern ' + pattern.myself + ' path ' + path.myself + 'matches? ' + pattern.matches?(path).to_s
+      # checkit = 'pattern ' + pattern.myself + ' path ' + path.myself + 'matches? ' + pattern.matches?(path).to_s
+      # puts checkit
       if pattern.matches?(path)
-        if pattern.wildcard_count <= fewest_wildcards
-          if pattern.wildcard_score > best_wildcard_score
+        if (pattern.wildcard_count < fewest_wildcards) ||
+          (pattern.wildcard_count == fewest_wildcards &&
+          pattern.wildcard_score > best_wildcard_score)
             fewest_wildcards = pattern.wildcard_count
             best_wildcard_score = pattern.wildcard_score
             match = pattern
-          end
         end
       end
     end
-    puts '-----'
-    puts path.myself
-    puts match.myself
-    puts '(((((((((((())))))))))))'
+  puts match.myself
   end
 end
 
-the_input = [6,
+the_input = the_input = [6,
 '*,b,*',
 'a,*,*',
 '*,*,c',
 'foo,bar,baz',
 'w,x,*,*',
 '*,x,y,z',
-5,
+9,
 '/w/x/y/z/',
 'a/b/c',
 'foo/',
 'foo/bar/',
-'foo/bar/baz/']
-find_best_match(the_input)
+'foo/bar/baz/',
+'/a/b/c/',
+'w/x/y/q',
+'////',
+'/*foo//baz/']
+
+# find_best_match(the_input)
+find_best_match()
