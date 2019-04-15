@@ -1,0 +1,11 @@
+*,x,y,z
+a,*,*
+NO MATCH
+NO MATCH
+foo,bar,baz
+*,b,*
+NO MATCH
+w,x,*,*
+NO MATCH
+*,b,*
+a,*,*
