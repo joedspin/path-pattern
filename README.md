@@ -1,6 +1,8 @@
 To execute from the command line:
 
-  cat input_file | ruby pattern_matching_paths.rb > output_file
+```
+cat input_file | ruby pattern_matching_paths.rb > output_file
+```
 
 ### Problem Description
 
